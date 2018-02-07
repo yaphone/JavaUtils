@@ -1,0 +1,98 @@
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class StringUtil {
+    private StringUtil() {
+    }
+
+    public static boolean checkSQLInjection(String str) {
+        String injStr = "'|and|exec|insert|select|delete|update|count|*|%|chr|mid|master|truncate|char|declare|;|or|-|+|,";
+        String[] injArr = injStr.split("\\|");
+
+        for(int i = 0; i < injArr.length; ++i) {
+            if (str.indexOf(injArr[i]) >= 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static final boolean isNullOrBlank(String str) {
+        if (str == null) {
+            return true;
+        } else {
+            return str.length() <= 0;
+        }
+    }
+
+    public static final String null2blank(String string) {
+        return string != null ? string : "";
+    }
+
+    public static final String trim(String str) {
+        return str == null ? "" : str.trim();
+    }
+
+    public static boolean isEmail(String email) {
+        if (null != email && !"".equals(email)) {
+            Pattern p = Pattern.compile("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*");
+            Matcher m = p.matcher(email);
+            return m.matches();
+        } else {
+            return false;
+        }
+    }
+
+    public static String transEmail(String email) {
+        if (!isEmail(email)) {
+            return email;
+        } else {
+            String[] strArr = email.split("@");
+            char[] strPrefix = strArr[0].toCharArray();
+            StringBuilder transEmail = new StringBuilder();
+            transEmail.append(strPrefix[0]);
+
+            for(int i = 1; i < strPrefix.length; ++i) {
+                transEmail.append("*");
+            }
+
+            transEmail.append("@").append(strArr[1]);
+            return transEmail.toString();
+        }
+    }
+
+    public static boolean isMobileNO(String mobile) {
+        Pattern p = Pattern.compile("^((13[0-9])|(14[0-9])|(15[^4,\\D])|(17[0-9])|(18[0,1,2,3,4,5-9]))\\d{8}$");
+        Matcher m = p.matcher(mobile);
+        return m.matches();
+    }
+
+    public static String transMobileNO(String mobile) {
+        if (!isMobileNO(mobile)) {
+            return mobile;
+        } else {
+            char[] arrMobile = mobile.toCharArray();
+            StringBuilder transMobileNO = new StringBuilder();
+            transMobileNO.append(arrMobile[0]).append(arrMobile[1]).append(arrMobile[2]);
+
+            for(int i = 3; i < 8; ++i) {
+                transMobileNO.append("*");
+            }
+
+            transMobileNO.append(arrMobile[8]).append(arrMobile[9]).append(arrMobile[10]);
+            return transMobileNO.toString();
+        }
+    }
+
+    public static String transUser(String userId) {
+        return transMobileNO(transEmail(userId));
+    }
+
+    public static void main(String[] args) {
+    }
+
+    public static String safeToString(Object o) {
+        return o == null ? "" : o.toString();
+    }
+}
